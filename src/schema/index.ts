@@ -1,1 +1,1 @@
-console.log('SCHEMAMCSCHEMAFACE!');
+export * from './qa';
