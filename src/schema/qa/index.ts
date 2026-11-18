@@ -1,3 +1,2 @@
-export * from './coverage';
-export * from './health';
-export * from './tsc';
+export * from './types';
+export * from './utilities';
