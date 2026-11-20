@@ -1,5 +1,5 @@
 import { DeepPartial, getObjectKeys } from "../objects";
-import { Reducer } from "./types";
+import { AsyncReducer, Reducer } from "./types";
 
 /**
  * The function is primarily to cut down on deep object spreads
@@ -54,3 +54,12 @@ export const stackDeltas = <State, Action>(
   if (!changes) return state;
   return deepReduce<State>(state, changes);
 }, state);
+
+export const stackReducersAsync = <State, Action>(
+  reducers: AsyncReducer<State, Action>[]
+): AsyncReducer<State, Action> => async (state, action) => {
+  if (reducers.length === 0) return state;
+  const [reducer, ...rest] = reducers;
+  const reduced = await reducer(state, action);
+  return stackReducersAsync(rest)(reduced, action);
+};

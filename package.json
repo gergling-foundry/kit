@@ -38,7 +38,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup && tsc",
+    "build": "tsup && tsc -p tsconfig.build.json",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "npm run typecheck && npm run build"

@@ -11,6 +11,7 @@ import {
   type ActionableTask,
   type ParsedCoverageSummary,
 } from '../../schema';
+import { readFileAsync } from './fs';
 
 const execFileAsync = promisify(execFile);
 
@@ -90,7 +91,7 @@ export async function extractLocalHealthReport(
   // 2. Extract coverage summary (gracefully handles missing coverage file)
   let coverageSummary: ParsedCoverageSummary = { total: null, files: {} };
   if (await fileExists(coverageFile)) {
-    const rawJson = JSON.parse(await readFile(coverageFile, 'utf8'));
+    const rawJson = JSON.parse(await readFileAsync(coverageFile));
     coverageSummary = parseCoverageSummary(rawJson, rootDir);
   }
 
