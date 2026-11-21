@@ -1,6 +1,10 @@
 import { resolve } from "node:path";
-import { ActionableTask } from "../../schema";
-import { assertWithinRoot, readFileAsync, resolveTargetOutputPath } from "../file";
+import { ActionableTask } from "@/schema";
+import {
+  assertWithinRoot,
+  readFileAsync,
+  resolveTargetOutputPath
+} from "@/node/file";
 
 export const readTarget = async ({
   rootDir,
