@@ -1,13 +1,30 @@
 import { mkdir } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
+import { callChatTransformer } from '@/core';
 import {
   applyAndVerifyProposal,
   extractLocalHealthReport,
   packTaskContext,
   writeFileAsync
 } from '@/node';
-import { callChatTransformer } from '@/core';
 import { getEnvVar } from './env';
+import { createLocalHfTransformer } from '@/lib/huggingface';
+
+const chatCompletionConfig = {
+  baseUrl: getEnvVar('LLM_BASE_URL', 'http://localhost:11434/v1'),
+  apiKey: getEnvVar('LLM_API_KEY', ''),
+  model: getEnvVar('LLM_MODEL', 'qwen2.5-coder:1.5b'),
+};
+
+console.log('Chat completion config:', chatCompletionConfig)
+
+const transform = chatCompletionConfig.baseUrl
+  ? (prompt: string) =>
+    callChatTransformer(prompt, chatCompletionConfig)
+  : createLocalHfTransformer({
+    model: 'onnx-community/Qwen2.5-Coder-1.5B-Instruct',
+    dtype: 'q4',
+  });
 
 const report = await extractLocalHealthReport({ minBranchCoverage: 85 });
 const [nextTask] = report.tasks;
@@ -26,17 +43,7 @@ console.log('Included Files:', context.includedFiles);
 console.log('Truncated Files:', context.truncatedFiles);
 console.log('Total Chars:', context.totalChars);
 
-const chatCompletionConfig = {
-  baseUrl: getEnvVar('LLM_BASE_URL', 'http://localhost:11434/v1'),
-  apiKey: getEnvVar('LLM_API_KEY', ''),
-  model: getEnvVar('LLM_MODEL', 'qwen2.5-coder:1.5b'),
-};
-
-console.log('Chat completion config:', chatCompletionConfig)
-
-const proposedCode = await callChatTransformer(
-  context.promptXml, chatCompletionConfig
-);
+const proposedCode = await transform(context.promptXml);
 
 const verification = await applyAndVerifyProposal(
   context.targetOutputPath,
