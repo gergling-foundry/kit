@@ -7,6 +7,7 @@ import {
   writeFileAsync
 } from '@/node';
 import { callChatTransformer } from '@/core';
+import { getEnvVar } from './env';
 
 const report = await extractLocalHealthReport({ minBranchCoverage: 85 });
 const [nextTask] = report.tasks;
@@ -25,11 +26,17 @@ console.log('Included Files:', context.includedFiles);
 console.log('Truncated Files:', context.truncatedFiles);
 console.log('Total Chars:', context.totalChars);
 
-const proposedCode = await callChatTransformer(context.promptXml, {
-  baseUrl: process.env.LLM_BASE_URL ?? 'http://localhost:11434/v1',
-  apiKey: process.env.LLM_API_KEY ?? '',
-  model: process.env.LLM_MODEL ?? 'qwen2.5-coder:1.5b',
-});
+const chatCompletionConfig = {
+  baseUrl: getEnvVar('LLM_BASE_URL', 'http://localhost:11434/v1'),
+  apiKey: getEnvVar('LLM_API_KEY', ''),
+  model: getEnvVar('LLM_MODEL', 'qwen2.5-coder:1.5b'),
+};
+
+console.log('Chat completion config:', chatCompletionConfig)
+
+const proposedCode = await callChatTransformer(
+  context.promptXml, chatCompletionConfig
+);
 
 const verification = await applyAndVerifyProposal(
   context.targetOutputPath,

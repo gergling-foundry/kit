@@ -19,6 +19,7 @@
     }
   },
   "include": [
+    "env.d.ts",
     "scripts",
     "src"
   ]

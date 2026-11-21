@@ -2,6 +2,15 @@ import { DeepPartial, getObjectKeys } from "../objects";
 import { AsyncReducer, Reducer } from "./types";
 
 /**
+ * Maps an object out using a reducer without explicitly setting the type.
+ * @param obj 
+ * @returns Typed object.
+ */
+export const reduceObject = <T, S extends object>(
+  items: T[], reducer: Reducer<S, T>, initial?: S
+) => items.reduce(reducer, (initial ?? {}) as S);
+
+/**
  * The function is primarily to cut down on deep object spreads
  * @param state The current state.
  * @param extension A deep-partial of the state type to extend or override the
