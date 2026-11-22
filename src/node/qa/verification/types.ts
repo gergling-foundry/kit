@@ -8,6 +8,8 @@ export const verifyProposalOptionsSchema = z.object({
     .describe('Maximum total lines allowed in the generated file (default: 250)'),
   rootDir: z.string().default(process.cwd())
     .describe('Root directory of the repository (defaults to process.cwd())'),
+  rollbackOnFailure: z.boolean().default(true)
+    .describe('Rollback if any of the verification steps fail'),
   runTests: z.boolean().default(true)
     .describe('Whether to run Vitest after tsc passes (default: true)'),
   tsconfigPath: z.string().default('tsconfig.json')

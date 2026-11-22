@@ -42,6 +42,7 @@ export async function applyAndVerifyProposal(
     rootDir,
     maxLines,
     maxLineDelta,
+    rollbackOnFailure,
     runTests,
     tsconfigPath,
   } = verifyProposalOptionsSchema.decode(options);
@@ -129,7 +130,7 @@ export async function applyAndVerifyProposal(
       lineDelta,
     };
   } catch (err) {
-    await rollback();
+    if (rollbackOnFailure) await rollback();
     throw err;
   }
 }

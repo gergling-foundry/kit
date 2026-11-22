@@ -16,11 +16,11 @@ const chatCompletionConfig = {
   model: getEnvVar('LLM_MODEL', 'qwen2.5-coder:1.5b'),
 };
 
-console.log('Chat completion config:', chatCompletionConfig)
-
 const transform = chatCompletionConfig.baseUrl
-  ? (prompt: string) =>
-    callChatTransformer(prompt, chatCompletionConfig)
+  ? (prompt: string) => {
+    console.log('Using local:', chatCompletionConfig)
+    return callChatTransformer(prompt, chatCompletionConfig);
+  }
   : createLocalHfTransformer({
     model: 'onnx-community/Qwen2.5-Coder-1.5B-Instruct',
     dtype: 'q4',
@@ -45,9 +45,12 @@ console.log('Total Chars:', context.totalChars);
 
 const proposedCode = await transform(context.promptXml);
 
+console.log('Transformation completed');
+
 const verification = await applyAndVerifyProposal(
   context.targetOutputPath,
-  proposedCode
+  proposedCode,
+  { rollbackOnFailure: false }
 );
 
 if (!verification.ok) {
