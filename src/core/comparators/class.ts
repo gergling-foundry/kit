@@ -5,7 +5,7 @@ export class ComparatorFactory<T> {
   constructor(private comparator: Comparator<T>) { }
 
   sort(values: T[]) { return [...values].sort((a, b) => this.comparator(a, b)); }
-  run(a: T, b: T) { return this.comparator(a, b); }
+  run = ((a: T, b: T) => this.comparator(a, b)).bind(this);
 
   flip = () => new ComparatorFactory<T>((
     a, b

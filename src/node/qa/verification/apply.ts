@@ -60,7 +60,7 @@ export async function applyAndVerifyProposal(
 
   // 2. Snapshot original file state
   const {
-    existedBefore, originalContent, rollback
+    originalContent, rollback
   } = await handleSnapshot(targetAbs);
 
   // 3. Enforce PR / file size limits before writing
@@ -95,7 +95,7 @@ export async function applyAndVerifyProposal(
       rootDir
     );
     if (!tscCheck.ok) {
-      await rollback();
+      if (rollbackOnFailure) await rollback();
       return {
         ok: false,
         stage: 'typecheck',
@@ -113,7 +113,7 @@ export async function applyAndVerifyProposal(
 
       const testCheck = await runProjectCommand(vitestArgs, rootDir);
       if (!testCheck.ok) {
-        await rollback();
+        if (rollbackOnFailure) await rollback();
         return {
           ok: false,
           stage: 'tests',

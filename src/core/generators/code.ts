@@ -19,6 +19,18 @@ export function stripCodeFences(raw: string): string {
 }
 
 /**
+ * Extracts code from a fenced markdown block if present, or returns trimmed raw text.
+ */
+export function extractCodeBlock(raw: string): string {
+  const fenced = /```(?:ts|typescript|js|javascript)?\(\r\)?\n([\s\(\S\)]*?)```/i.exec(raw);
+  if (fenced?.[1]) {
+    return fenced[1].trim();
+  }
+  return raw.trim();
+}
+
+
+/**
  * Provider-agnostic, zero-dependency OpenAI-compatible chat completion caller.
  * Works with local Ollama, Gemini OpenAI-compat endpoint, Groq, and OpenRouter.
  */
@@ -57,5 +69,5 @@ export async function callChatTransformer(
     throw new Error('LLM returned an empty completion response.');
   }
 
-  return stripCodeFences(content);
+  return extractCodeBlock(content);
 }

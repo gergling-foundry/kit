@@ -1,6 +1,7 @@
 import { deepReduce, Reducer } from "@/core";
 import { ActionableTask } from "@/schema";
 import { ContextBaseAction, ContextState } from "../types";
+import { taskInstructions } from "./instructions";
 
 export const reduceContextTask: Reducer<ContextState, ContextBaseAction> = (
   state,
@@ -20,5 +21,6 @@ export const reduceContextTask: Reducer<ContextState, ContextBaseAction> = (
       : `  <coverage branch_pct="${task.branchPct}" line_pct="${task.linePct}" />`,
     `</task>`,
     `<target_source path="${task.filePath}">\n${targetContent}\n</target_source>`,
+    taskInstructions({ ...task, targetOutputPath }),
   ]
 });
