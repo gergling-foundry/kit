@@ -1,6 +1,8 @@
 import { Delta, Reducer } from "./types";
 import { deepReduce } from "./utilities";
 
+type StackDelta<State, Action> = Delta<State, Action, { idx?: number; }>;
+
 type ReducerStackCreateParams<State, Action> = {
   action: Action;
   deepReduce: typeof deepReduce<State>;
@@ -15,14 +17,14 @@ type ReducerStackParams<State, Action> = (
   | ReducerStackFactory<State, Action>
   | (ReducerStackFactory<State, Action>[])
   | ({
-    deltas: Delta<State, Action>[];
+    deltas: StackDelta<State, Action>[];
   } | {
     reducers: Reducer<State, Action>[];
   })
 );
 
 export class ReducerStack<
-  State, Action, Async extends boolean = false
+  State, Action
 > extends Function {
   static create<
     State, Action
@@ -44,10 +46,10 @@ export class ReducerStack<
   static initialise<State, Action>(
     initialState: State
   ) { return ReducerStack.create<State, Action>(() => initialState); }
-  constructor(private reducers: Reducer<State, Action, Async>[]) { super(); }
+  constructor(private reducers: Reducer<State, Action>[]) { super(); }
   call(state: State, action: Action) {
     return this.reducers.reduce(
-      (state, reducer) => reducer(state, action),
+      (state, reducer, idx) => reducer(state, action, idx),
       state
     );
   }
@@ -58,9 +60,9 @@ export class ReducerStack<
       })
     );
   }
-  delta(delta: Delta<State, Action>) {
-    return this.reduce((state, action) => {
-      const changes = delta({ action, state });
+  delta(delta: StackDelta<State, Action>) {
+    return this.reduce((state, action, idx) => {
+      const changes = delta({ action, idx, state });
       if (!changes) return state;
       return deepReduce<State>(state, changes);
     });
