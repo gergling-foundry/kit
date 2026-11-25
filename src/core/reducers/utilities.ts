@@ -50,7 +50,7 @@ export const stackReducers = <State, Action>(
   reducers: Reducer<State, Action>[]
 ): Reducer<State, Action> => (
   state, action
-) => reducers.reduce((state, reducer) => reducer(state, action), state);
+) => reducers.reduce((state, reducer, idx) => reducer(state, action, idx), state);
 
 export const stackDeltas = <State, Action>(
   deltas: (
