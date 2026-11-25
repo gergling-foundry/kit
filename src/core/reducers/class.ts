@@ -75,4 +75,5 @@ export class ReducerStack<
   reduce(reducer: Reducer<State, Action>) {
     return new ReducerStack([...this.reducers, reducer]);
   }
+  get toReducer() { return this.call.bind(this); }
 }
