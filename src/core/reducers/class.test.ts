@@ -101,11 +101,11 @@ describe('ReducerStack', () => {
 
   describe('chaining & immutability', () => {
     it('does not mutate earlier stack instances when chaining new steps', () => {
-      const baseStack = ReducerStack.create<number, number>().reduce(
+      const baseStack = ReducerStack.create<number, number>().reducer(
         (state, action) => state + action
       );
 
-      const extendedStack = baseStack.reduce((state) => state * 10);
+      const extendedStack = baseStack.reducer((state) => state * 10);
 
       expect(baseStack.call(1, 2)).toBe(3);
       expect(extendedStack.call(1, 2)).toBe(30);
@@ -116,7 +116,7 @@ describe('ReducerStack', () => {
       const deltaIndices: (number | undefined)[] = [];
 
       const stack = ReducerStack.create<{ steps: number }, void>()
-        .reduce((state, _action, idx) => {
+        .reducer((state, _action, idx) => {
           reduceIndices.push(idx);
           return state;
         })
@@ -124,7 +124,7 @@ describe('ReducerStack', () => {
           deltaIndices.push(idx);
           return undefined;
         })
-        .reduce((state, _action, idx) => {
+        .reducer((state, _action, idx) => {
           reduceIndices.push(idx);
           return state;
         });

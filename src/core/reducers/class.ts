@@ -43,6 +43,9 @@ export class ReducerStack<
     );
     return new ReducerStack(params.reducers);
   }
+  static delta<State, Action>(delta: StackDelta<State, Action>) {
+    return ReducerStack.create({ deltas: [delta] });
+  }
   static initialise<State, Action>(
     initialState: State
   ) { return ReducerStack.create<State, Action>(() => initialState); }
@@ -54,25 +57,31 @@ export class ReducerStack<
     );
   }
   create(factory: ReducerStackFactory<State, Action>) {
-    return this.reduce(
+    return this.reducer(
       (state, action) => factory({
         action, deepReduce, state
       })
     );
   }
   delta(delta: StackDelta<State, Action>) {
-    return this.reduce((state, action, idx) => {
+    return this.reducer((state, action, idx) => {
       const changes = delta({ action, idx, state });
       if (!changes) return state;
       return deepReduce<State>(state, changes);
     });
   }
   enrich(enricher: (params: { state: State, action: Action }) => State) {
-    return this.reduce(
+    return this.reducer(
       (state: State, action: Action) => enricher({ action, state })
     );
   }
-  reduce(reducer: Reducer<State, Action>) {
+  initialise(initial: State) {
+    return (actions: Action[]) => this.reduce(initial, actions);
+  }
+  reduce(initial: State, actions: Action[]) {
+    return actions.reduce(this.toReducer, initial);
+  }
+  reducer(reducer: Reducer<State, Action>) {
     return new ReducerStack([...this.reducers, reducer]);
   }
   get toReducer() { return this.call.bind(this); }
